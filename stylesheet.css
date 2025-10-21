@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f0f2f5;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 30px;
+    background-color: #1e3a8a;
+    color: white;
+  }
+  
+  #map {
+    margin: 20px auto;
+    width: 80%;
+    height: 500px;
+    border: 2px solid #ccc;
+  }
+  
+  #input-section {
+    margin-top: 20px;
+  }
+  
+  #country-input {
+    padding: 10px;
+    width: 250px;
+    font-size: 16px;
+    border: 2px solid #1e3a8a;
+    border-radius: 5px;
+  }
+  
+  #submit-btn {
+    padding: 10px 20px;
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  #submit-btn:hover {
+    background-color: #2563eb;
+  }
+  
+  #status-light {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
+    background-color: gray;
+  }
+  
+  #game-over {
+    font-size: 22px;
+    color: red;
+    margin-top: 20px;
+    display: none;
+  }
