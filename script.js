@@ -17,6 +17,55 @@ let achievements = {
     speedDemon: false
 };
 
+// Sample countries data
+const countries = [
+    { 
+        name: 'United States', 
+        code: 'us', 
+        lat: 37.0902, 
+        lng: -95.7129, 
+        capital: 'Washington, D.C.', 
+        population: 331002651, 
+        area: 9833520 
+    },
+    { 
+        name: 'France', 
+        code: 'fr', 
+        lat: 46.2276, 
+        lng: 2.2137, 
+        capital: 'Paris', 
+        population: 65273511, 
+        area: 551695 
+    },
+    { 
+        name: 'Japan', 
+        code: 'jp', 
+        lat: 36.2048, 
+        lng: 138.2529, 
+        capital: 'Tokyo', 
+        population: 126476461, 
+        area: 377975 
+    },
+    { 
+        name: 'Brazil', 
+        code: 'br', 
+        lat: -14.2350, 
+        lng: -51.9253, 
+        capital: 'Brasília', 
+        population: 212559417, 
+        area: 8515767 
+    },
+    { 
+        name: 'Australia', 
+        code: 'au', 
+        lat: -25.2744, 
+        lng: 133.7751, 
+        capital: 'Canberra', 
+        population: 25499884, 
+        area: 7692024 
+    }
+];
+
 // Initialize the map with better settings
 function initMap() {
     map = L.map('map', {
@@ -41,10 +90,6 @@ function initMap() {
         'Satellite': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles © Esri',
             maxZoom: 19
-        }),
-        'Topographic': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data: © OpenStreetMap contributors',
-            maxZoom: 17
         })
     };
 
@@ -101,6 +146,7 @@ function startNewRound() {
     updateHintsDisplay();
     document.getElementById('country-input').value = '';
     document.getElementById('country-input').focus();
+    document.getElementById('flag-container').innerHTML = '';
     
     // Randomly choose game mode
     gameMode = Math.random() > 0.5 ? 'find' : 'name';
@@ -122,7 +168,12 @@ function startFindCountryRound() {
     
     // Add flag to question
     const flagContainer = document.getElementById('flag-container');
-    flagContainer.innerHTML = `<span class="flag-icon flag-icon-${currentCountry.code.toLowerCase()}"></span>`;
+    flagContainer.innerHTML = `
+        <div class="flag-wrapper">
+            <span class="flag-icon flag-icon-${currentCountry.code.toLowerCase()}"></span>
+        </div>
+        <div class="country-name">${currentCountry.name}</div>
+    `;
     
     // Add marker to the map
     const marker = L.marker(
@@ -180,7 +231,7 @@ function getRandomCountry() {
 
 // Get a random point within a country's bounds
 function getRandomPointInCountry(country) {
-    // Simple approximation - in a real app, you might want to use a more accurate method
+    // Simple approximation
     const lat = country.lat + (Math.random() - 0.5) * 10;
     const lng = country.lng + (Math.random() - 0.5) * 20;
     return { lat, lng };
@@ -430,13 +481,3 @@ document.addEventListener('DOMContentLoaded', () => {
         showFeedback('Welcome to GeoGuess Quest!', 'info');
     }, 1000);
 });
-
-// Sample countries data (in a real app, you might want to fetch this from an API)
-const countries = [
-    { name: 'United States', code: 'US', lat: 37.0902, lng: -95.7129, capital: 'Washington, D.C.', population: 331002651, area: 9833520 },
-    { name: 'France', code: 'FR', lat: 46.2276, lng: 2.2137, capital: 'Paris', population: 65273511, area: 551695 },
-    { name: 'Japan', code: 'JP', lat: 36.2048, lng: 138.2529, capital: 'Tokyo', population: 126476461, area: 377975 },
-    { name: 'Brazil', code: 'BR', lat: -14.2350, lng: -51.9253, capital: 'Brasília', population: 212559417, area: 8515767 },
-    { name: 'Australia', code: 'AU', lat: -25.2744, lng: 133.7751, capital: 'Canberra', population: 25499884, area: 7692024 }
-    // Add more countries as needed
-];
