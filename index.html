@@ -1,212 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Map Guessing Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #afb3a3;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 30px;
-      background-color: #1e3a8a;
-      color: white;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    #map {
-      margin: 20px auto;
-      width: 80%;
-      height: 500px;
-      border: 2px solid #ccc;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    #input-section {
-      margin-top: 20px;
-    }
-    #country-input {
-      padding: 10px;
-      width: 250px;
-      font-size: 16px;
-      border: 2px solid #1e3a8a;
-      border-radius: 5px;
-    }
-    #country-input:focus {
-      outline: none;
-      border-color: #2563eb;
-    }
-    #submit-btn {
-      padding: 10px 20px;
-      background-color: #1e3a8a;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-left: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: background-color 0.3s ease;
-
-    }
-    #submit-btn:hover {
-      background-color: #2563eb;
-    }
-    #status-light {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-left: 10px;
-      background-color: gray;
-    }
-    #game-over {
-      font-size: 22px;
-      color: red;
-      margin-top: 20px;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 GeoGuess Quest</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
-  <header>
-    <h1>World Map Guessing Game</h1>
-    <div>Score: <span id="score">0</span></div>
-  </header>
+    <!-- Audio Elements -->
+    <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
+    <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="hint-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" preload="auto"></audio>
+    <audio id="level-up-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
+    
+    <div class="game-container">
+        <!-- Header Section -->
+        <header class="game-header">
+            <div class="header-content">
+                <h1>🌍 GeoGuess Quest</h1>
+                <div class="game-stats">
+                    <div class="stat">
+                        <span class="stat-label">Score</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Streak</span>
+                        <span id="streak" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Time</span>
+                        <span id="timer" class="stat-value">0:30</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="difficulty-selector">
+                <select id="difficulty" class="control-btn">
+                    <option value="easy">🌱 Easy</option>
+                    <option value="medium" selected>🌿 Medium</option>
+                    <option value="hard">🔥 Hard</option>
+                </select>
+            </div>
+        </header>
 
-  <div id="map"></div>
+        <!-- Game Area -->
+        <div class="game-area">
+            <!-- Left Panel -->
+            <div class="left-panel">
+                <!-- Question Box -->
+                <div id="question" class="question-box">
+                    <div id="question-text">Find the highlighted country!</div>
+                    <div id="flag-container" class="flag-container"></div>
+                </div>
+                
+                <!-- Input Section -->
+                <div class="input-group">
+                    <input type="text" 
+                           id="country-input" 
+                           placeholder="Type the country name..." 
+                           autocomplete="off"
+                           aria-label="Country name input">
+                    <button id="submit-btn" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Submit
+                    </button>
+                </div>
+                
+                <!-- Hint Section -->
+                <div class="hint-section">
+                    <div id="hint" class="hint-box">
+                        <div id="hint-content">
+                            <p>Use the hint button to get clues about the country!</p>
+                        </div>
+                    </div>
+                    <div class="hint-controls">
+                        <button id="hint-btn" class="control-btn hint-btn" title="Get a hint">
+                            <i class="fas fa-lightbulb"></i> Hint
+                        </button>
+                        <button id="giveup-btn" class="control-btn giveup-btn" title="Give up">
+                            <i class="fas fa-flag"></i> Give Up
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div id="progress-container">
+                    <div class="progress-labels">
+                        <span>Round Progress</span>
+                        <span id="progress-percent">100%</span>
+                    </div>
+                    <div id="progress-bar">
+                        <div id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Container -->
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+        </div>
+        
+        <!-- Country Fact Section -->
+        <div id="country-fact" class="fact-box">
+            <h3>Did you know?</h3>
+            <div id="fact-content"></div>
+            <a id="wikipedia-link" href="#" target="_blank" class="wiki-link">
+                <i class="fas fa-external-link-alt"></i> Learn more on Wikipedia
+            </a>
+        </div>
+        
+        <!-- Achievements Section -->
+        <div id="achievements" class="achievements-container">
+            <h3><i class="fas fa-trophy"></i> Achievements</h3>
+            <div id="achievements-list" class="achievements-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
 
-  <div id="input-section">
-    <input type="text" id="country-input" placeholder="Type the country name..." />
-    <button id="submit-btn">Submit</button>
-    <div id="status-light"></div>
-  </div>
-
-  <div id="game-over">Game Over! Try again?</div>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script>
-    let map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Sample list of countries (for MVP)
-    const countries = [
-      { name: 'Ethiopia', coords: [9.145, 40.4897] },
-      { name: 'Canada', coords: [56.1304, -106.3468] },
-      { name: 'Brazil', coords: [-14.235, -51.9253] },
-      { name: 'Japan', coords: [36.2048, 138.2529] },
-      { name: 'France', coords: [46.6034, 1.8883] },
-      { name: 'Nigeria', coords: [9.082, 8.6753] },
-      { name: 'Germany', coords: [51.1657, 10.4515] },
-      { name: 'Italy', coords: [41.8719, 12.5674] },
-      { name: 'United States', coords: [37.0902, -95.7129] },
-      { name: 'United Kingdom', coords: [55.3781, -3.4359] },
-      { name: 'Australia', coords: [-25.2744, 133.7751] },
-      { name: 'Mexico', coords: [23.6345, -102.5528] },
-      { name: 'South Africa', coords: [-30.5595, 22.9375] },
-      { name: 'India', coords: [20.5937, 78.9629] },
-      { name: 'Argentina', coords: [-38.4161, -63.6167] },
-      { name: 'China', coords: [35.8617, 104.1954] },
-      { name: 'Russia', coords: [61.5240, 105.3188] },
-      { name: 'South Korea', coords: [37.5665, 126.9780] },
-      { name: 'Saudi Arabia', coords: [24.6958, 46.7216] },
-      { name: 'Egypt', coords: [26.8206, 30.8025] },
-      { name: 'Morocco', coords: [31.7917, -7.0926] },
-      { name: 'Tunisia', coords: [33.8869, 9.5375] },
-      { name: 'Algeria', coords: [28.0339, 1.6596] },
-      { name: 'Libya', coords: [32.8767, 13.1876] },
-      { name: 'Greece', coords: [37.9838, 23.7292] },
-      { name: 'Ireland', coords: [53.1424, -7.6921] },
-      { name: 'Denmark', coords: [56.2639, 9.5018] },
-      { name: 'Norway', coords: [60.4720, 8.4689] },
-      { name: 'Sweden', coords: [60.1282, 18.6435] },
-      { name: 'Finland', coords: [61.9241, 25.7482] },
-      { name: 'Iceland', coords: [64.9631, -19.0208] },
-      { name: 'Poland', coords: [51.9194, 19.1451] },
-      { name: 'Ukraine', coords: [48.3794, 31.1656] },
-      { name: 'Romania', coords: [45.9432, 24.9668] },
-      { name: 'Bulgaria', coords: [42.7335, 25.4858] },
-      { name: 'Serbia', coords: [44.0165, 21.0059] },
-      { name: 'Croatia', coords: [45.1, 15.2] },
-      { name: 'Slovakia', coords: [48.6690, 19.6990] },
-      { name: 'Hungary', coords: [47.1625, 19.5033] },
-      { name: 'Slovenia', coords: [46.1512, 14.9955] },
-      { name: 'Czech Republic', coords: [49.8175, 15.4729] },
-      { name: 'Bosnia and Herzegovina', coords: [43.9159, 17.6791] },
-      { name: 'Macedonia', coords: [41.6086, 21.7453] },
-      { name: 'Montenegro', coords: [42.7087, 19.3744] },
-      { name: 'Kosovo', coords: [42.6026, 20.9020] },
-      { name: 'North Macedonia', coords: [41.6086, 21.7453] },
-      { name: 'Belize', coords: [17.1899, -88.4976] },
-      { name: 'Guatemala', coords: [15.7835, -90.2308] },
-      { name: 'El Salvador', coords: [13.7942, -88.8965] },
-      { name: 'Honduras', coords: [15.1992, -86.2419] },
-      { name: 'Nicaragua', coords: [12.8654, -85.2072] },
-      { name: 'Costa Rica', coords: [9.7489, -83.7534] },
-      { name: 'Panama', coords: [8.5378, -80.7821] },
-      { name: 'Colombia', coords: [4.5709, -74.2973] },
-      { name: 'Venezuela', coords: [6.4238, -66.5897] },
-      { name: 'Peru', coords: [-9.1897, -75.0152] },
-      { name: 'Argentina', coords: [-38.4161, -63.6167] },
-      { name: 'Chile', coords: [-35.6751, -71.5430] },
-      { name: 'Uruguay', coords: [-32.5228, -55.7658] },
-      { name: 'Paraguay', coords: [-23.4425, -58.4438] }
-    ];
-
-    let currentCountry = null;
-    let marker = null;
-    let score = 0;
-
-    function highlightRandomCountry() {
-      const randomIndex = Math.floor(Math.random() * countries.length);
-      currentCountry = countries[randomIndex];
-      if (marker) marker.remove();
-      marker = L.circleMarker(currentCountry.coords, {
-        color: 'yellow',
-        radius: 10,
-        fillOpacity: 0.7
-      }).addTo(map);
-      map.setView(currentCountry.coords, 3);
-    }
-
-    function updateScore() {
-      document.getElementById('score').textContent = score;
-    }
-
-    function setLight(color) {
-      const light = document.getElementById('status-light');
-      light.style.backgroundColor = color;
-    }
-
-    document.getElementById('submit-btn').addEventListener('click', () => {
-      const userInput = document.getElementById('country-input').value.trim();
-      if (!currentCountry) return;
-
-      if (userInput.toLowerCase() === currentCountry.name.toLowerCase()) {
-        score++;
-        updateScore();
-        setLight('green');
-        document.getElementById('country-input').value = '';
-        highlightRandomCountry();
-      } else {
-        setLight('red');
-        document.getElementById('game-over').style.display = 'block';
-        document.getElementById('submit-btn').disabled = true;
-      }
-    });
-
-    highlightRandomCountry();
-  </script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
+    <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="script.js"></script>
 </body>
 </html>
